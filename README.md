@@ -23,12 +23,7 @@
 14. [Примеры использования](#примеры-использования)
 ## Установка
 ```bash
-pip install hypdelay # если пакет загружен в PyPI
-````
-Или установите из исходников:
-
-```bash
-git clone https://github.com/yourusername/hypdelay.git
+git clone https://github.com/PrimaHyadum/HypDelay.git
 cd hypdelay
 pip install -e .
 ```
