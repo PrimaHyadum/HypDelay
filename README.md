@@ -86,7 +86,7 @@ $$
 **Начальные условия:**
 
 $$
-u(x, t) = e^{-t}\sin(\pi x), \quad -\tau \le t \le 0,\; 0 \le x \le 1.
+u(x, t) = e^{-t}\sin(\pi x), \quad -\tau \le t \le 0,\; 0 \le x \le L.
 $$
 
 **Граничные условия:**
