@@ -20,7 +20,7 @@
 11. [Сохранение результатов](#сохранение-результатов)
 12. [Графический интерфейс (GUI)](#графический-интерфейс-gui)
 13. [Создание пользовательских моделей и методов](#создание-пользовательских-моделей-и-методов)
-14. [Примеры использования](#примеры-использования)
+
 ## Установка
 ```bash
 git clone https://github.com/PrimaHyadum/HypDelay.git
@@ -61,10 +61,7 @@ model = hd.HyperbolicModel(a=1.0, tau=2.0)
 # Метод
 method = hd.PrimeMethod()
 # Солвер
-solver = hd.DelayPDESolver(
-model=model, method=method,
-x0=0.0, t0=0.0, s=0.4, L=1.0, T=4.0, M=18, N=8
-)
+solver = hd.DelayPDESolver(model=model, method=method, x0=0.0, t0=0.0, s=0.4, L=1.0, T=4.0, M=18, N=8)
 # Решение
 A, cfg = solver.solve()
 # Ошибки
@@ -195,8 +192,8 @@ model = hd.DoubleSineGordonKinkModel(a=1.0, tau=0.0, m=1.0, u_kin=0.5, delta_kin
 
 | Класс | Описание |
 | --- | --- |
-| `PWLinearInterpExtrap` | Кусочно-линейная интерполяция и экстраполяция продолжением (формулы (7)–(8) из теории). |
-| `PrimeMethod` | Прямой доступ по индексу без учёта предыстории. Воспроизводит исходный метод из `start_late_4.py`. |
+| `PWLinearInterpExtrap` | Кусочно-линейная интерполяция и экстраполяция продолжением. |
+| `PrimeMethod` | Прямой доступ по индексу без учёта предыстории. |
 | `PrimeHybridMethod` | Прямой доступ по индексу с учётом предыстории. |
 
 **Пример создания:**
@@ -217,7 +214,7 @@ x0=0.0, t0=0.0, s=0.4, L=1.0, T=4.0, M=18, N=8
 Параметры:
 
 * `x0`, `t0` – начальные координаты.
-* `s` – весовой коэффициент схемы (0 – явная, 1 – неявная).
+* `s` – весовой коэффициент схемы.
 * `L`, `T` – конечные координаты.
 * `N` – число узлов по пространству.
 * `M` – число узлов по времени.
@@ -233,7 +230,7 @@ x0=0.0, t0=0.0, s=0.4, L=1.0, T=4.0, M=18, N=8
 * Параметры сетки: `x0`, `t0`, `L`, `T`, `N`, `M`, `s`
 * Вычисляемые: `h` (шаг по x), `delta` (шаг по t), `rh` (`(a*delta/h)^2`), `r` (`s * rh`), `eps=1e-12`.
 
-Доступ к полям: `cfg.h`, `cfg.delta` и т.д.
+Доступ к константам: `cfg.h`, `cfg.delta` и т.д.
 
 ## Вычисление ошибок
 
@@ -259,16 +256,18 @@ hd.plot_solution(model, A, cfg, title="Численное решение", show=
 
 ```python
 solutions = [(A1, cfg1), (A2, cfg2), ...] # список кортежей
+
 anim = hd.PlotAnimation(
-solutions,
-fps=5, # кадры в секунду
-figsize=(10,7), # размер фигуры в дюймах
-dpi=100, # разрешение
-plot_type='surface', # 'surface' или 'wireframe'
-elev=30, azim=-60, # начальный угол обзора
-repeat=True, # зацикливание
-errors=None # список кортежей (max_err, l2_err, mae) для отображения
-)
+    solutions,
+    fps=5, # кадры в секунду
+    figsize=(10,7), # размер фигуры в дюймах
+    dpi=100, # разрешение
+    plot_type='surface', # 'surface' или 'wireframe'
+    elev=30, azim=-60, # начальный угол обзора
+    repeat=True, # зацикливание
+    errors=None # список кортежей (max_err, l2_err, mae) для отображения
+    )
+
 anim.create_animation() # подготовка анимации
 anim.show() # показ в окне matplotlib
 ```
@@ -319,24 +318,30 @@ app = hd.run_gui()
 ```python
 from hypdelay import PDEModel
 import numpy as np
+
 class MyModel(PDEModel):
-def __init__(self, a, tau, extra_param):
-super().__init__(a, tau)
-self.extra = extra_param
-def exact_solution(self, x, t):
-return np.sin(np.pi * x) * np.cos(t)
-def initial_derivative(self, x, t):
-return -np.sin(np.pi * x) * np.sin(t)
-def source_term(self, u_current, u_delayed, x, t):
-# f(x,t,u,u_tau)
-return -np.pi**2 * self.a**2 * u_current + u_delayed * (1 - u_current)
-# Необязательно:
-def initial_condition(self, x, t):
-return self.exact_solution(x, t)
-def boundary_condition_x0(self, x, t):
-return 0.0
-def boundary_condition_L(self, x, t):
-return 0.0
+    def __init__(self, a, tau):
+        super().__init__(a, tau)
+        
+    def exact_solution(self, x, t):
+        return np.sin(np.pi * x) * np.cos(t)
+    
+    def initial_derivative(self, x, t):
+        return -np.sin(np.pi * x) * np.sin(t)
+        
+    def source_term(self, u_current, u_delayed, x, t):
+        # f(x,t,u,u_tau)
+        return -np.pi**2 * self.a**2 * u_current + u_delayed * (1 - u_current)
+        
+    # Необязательно:
+    def initial_condition(self, x, t):
+        return self.exact_solution(x, t)
+        
+    def boundary_condition_x0(self, x, t):
+        return 0.0
+    
+    def boundary_condition_L(self, x, t):
+        return 0.0
 ```
 ### Новый метод
 
@@ -345,45 +350,21 @@ return 0.0
 ```python
 from hypdelay import PDEMethod
 class MyMethod(PDEMethod):
-def get_current_extrapolation(self, cfg, u_prev, u_prev2):
-delta = cfg.delta
-s = cfg.s
-return ((delta + s) * u_prev - s * u_prev2) / delta
-def get_delayed_value(self, cfg, history, A, t_current, x_idx):
-tau = cfg.tau
-t0 = cfg.t0
-delta = cfg.delta
-t_delayed = t_current - tau
-if t_delayed < t0:
-return None # u_delayed = u_current
-idx = int(round((t_delayed - t0) / delta))
-idx = max(0, min(idx, len(A)-1))
-return A[idx][x_idx]
-```
-## Примеры использования
-
-В репозитории есть файлы `test1.py` и `test2.py`, демонстрирующие:
-
-* Решение с встроенными моделью и методом.
-* Создание пользовательских модели и метода, аналогичных описанным выше.
-* Параметрический перебор по `tau` и создание анимации.
-
-Запустите их:
-
-```bash
-python test1.py
-python test2.py
-```
-или откройте GUI:
-
-```bash
-python -c "import hypdelay as hd; hd.run_gui()"
-```
----
-
-**Авторы:** [Ваше имя]
-**Благодарности:** Научному руководителю за постановку задачи и ценные обсуждения.
-
-```text
-Этот документ покрывает все указанные вами аспекты: описание библиотеки, все функции, модели с математическими формулами, примеры вызова, архитектуру, GUI, сохранение, анимацию и инструкцию для пользователя. Вы можете добавить его в корень репозитория как `README.md` или разместить в отдельном файле документации.
+    def get_current_extrapolation(self, cfg, u_prev, u_prev2):
+        delta = cfg.delta
+        s = cfg.s
+        return ((delta + s) * u_prev - s * u_prev2) / delta
+        
+    def get_delayed_value(self, cfg, history, A, t_current, x_idx):
+        tau = cfg.tau
+        t0 = cfg.t0
+        delta = cfg.delta
+        
+        t_delayed = t_current - tau
+        if t_delayed < t0:
+            return None # u_delayed = u_current
+            
+        idx = int(round((t_delayed - t0) / delta))
+        idx = max(0, min(idx, len(A)-1))
+        return A[idx][x_idx]
 ```
