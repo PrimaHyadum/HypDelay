@@ -33,10 +33,10 @@ pip install -e .
 hypdelay/
 ├── __init__.py
 ├── core/
-│ ├── solver.py – класс DelayPDESolver
-│ ├── history.py – работа с историей
-│ ├── config.py – класс Config
-│ └── base.py – абстрактные классы PDEModel, PDEMethod
+│        ├── solver.py – класс DelayPDESolver
+│        ├── history.py – работа с историей
+│        ├── config.py – класс Config
+│        └── base.py – абстрактные классы PDEModel, PDEMethod
 ├── models/ – встроенные модели (Hyperbolic, Sine‑Gordon, φ⁴ и др.)
 ├── methods/ – методы интерполяции/экстраполяции
 ├── utils/ – вычисление ошибок, построение графиков, анимация, сохранение, устойчивость
